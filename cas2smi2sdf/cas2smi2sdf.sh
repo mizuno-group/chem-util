@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # activate your python environment
-source /opt/pip-env/bin/activate
+source ~/python_env/chemoinfo/bin/activate
 
 << COMMENT
 args:
@@ -25,10 +25,10 @@ COMMENT
 
 
 python3 $(dirname $0)/cas2smi2sdf.py \
-    mode cas2sdf \
-    --url None \
-    --cas_csv None \
-    --cas_col None \
-    --smi_csv: None \
-    --smi_col None \
-    --sdf_dir None
+    --mode "None" \
+    --url "None" \
+    --cas_csv "None" \
+    --cas_col "None" \
+    --smi_csv  "None" \
+    --smi_col "None" \
+    --sdf_dir "None"

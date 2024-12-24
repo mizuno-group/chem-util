@@ -49,11 +49,14 @@ def cas2smi(args):
         dataframe contains SMILES and other information
     """
 
-    slack = True if args.url is not None else False
+    slack = True if args.url != "None" else False
 
-    cas = pd.read_csv(args.cas_csv, index_col=0)
+    cas = pd.read_csv(args.cas_csv)
     cas = cas[args.cas_col]
-    cas = cas.dropna().drop_duplicates()
+    print(cas)
+    cas.dropna(inplace=True)
+    cas.drop_duplicates(inplace=True)
+    print(cas)
     length = len(cas)
     df_smiles = pd.DataFrame([], columns=["CID", "CAS", "IsomericSMILES", "XLogP", "MolecularWeight", "MolecularFormula", "IUPACName"])
     properties = ["IsomericSMILES", "XLogP", "MolecularWeight", "MolecularFormula", "IUPACName"]
@@ -65,7 +68,7 @@ def cas2smi(args):
     # get_properties
     for i, c in enumerate(cas):
         try:
-            info = get_properties(properties, cas, "name", as_dataframe=True)
+            info = get_properties(properties, c, "name", as_dataframe=True)
         except:
             if slack:
                 if (i+1) % 10000 == 0:
@@ -149,7 +152,7 @@ def smi2sdf(df_smiles, args):
         SMILES which failed to get sdf
     """
 
-    slack = True if args.url is not None else False
+    slack = True if args.url != "None" else False
 
     smiles = df_smiles[args.smi_col]
     
@@ -207,12 +210,12 @@ def main(args):
         else:
             print("no failed smi")
 
-    if args.mode == "cas2smi":
+    elif args.mode == "cas2smi":
         _ = cas2smi(args)
 
-    if args.mode == "smi2sdf":
+    elif args.mode == "smi2sdf":
         os.makedirs(args.sdf_dir, exist_ok=True)
-        df_smiles = pd.read_csv(args.smi_csv, index_col=0)
+        df_smiles = pd.read_csv(args.smi_csv)
         failed = smi2sdf(df_smiles, args)
         if len(failed) != 0:
             if len(failed) <= 10:
@@ -224,10 +227,13 @@ def main(args):
                     f.write(str(idx) + "  " + str(smi) + "\n")
         else:
             print("no failed smi")
+    
+    else:
+        raise NameError('invalid mode. --mode should be "cas2sdf" or "cas2smi" or "smi2sdf"')
 
 if __name__ == "__main__":
     parser = ArgumentParser()
-    parser.add_argument("mode")
+    parser.add_argument("--mode")
     parser.add_argument("--url")
     parser.add_argument("--cas_csv")
     parser.add_argument("--cas_col")
